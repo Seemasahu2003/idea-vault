@@ -1,0 +1,768 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Idea Vault - Personal Idea Notebook</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    },
+                }
+            }
+        }
+    </script>
+    <style>
+        /* Custom smooth scroll and hide scrollbar for clean UI */
+        .no-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .no-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-800 font-sans antialiased selection:bg-indigo-500 selection:text-white pb-20 md:pb-0 md:pl-64 min-h-screen flex flex-col">
+
+    <!-- Desktop Sidebar Navigation -->
+    <aside class="hidden md:flex flex-col w-64 bg-white border-r border-slate-200 fixed inset-y-0 left-0 z-30 p-6 shadow-sm">
+        <div class="flex items-center gap-3 mb-8 px-2">
+            <div class="w-10 h-10 rounded-xl bg-indigo-600 flex items-center justify-center text-white shadow-md shadow-indigo-100">
+                <i class="fa-solid fa-lightbulb text-lg"></i>
+            </div>
+            <div>
+                <h1 class="font-bold text-lg text-slate-900 leading-tight">Idea Vault</h1>
+                <p class="text-xs text-slate-400">Capture & Grow</p>
+            </div>
+        </div>
+
+        <nav class="space-y-1.5 flex-1">
+            <button onclick="switchTab('home')" id="nav-home" class="nav-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all text-indigo-600 bg-indigo-50">
+                <i class="fa-solid fa-house w-5 text-center"></i> Home
+            </button>
+            <button onclick="switchTab('ideas')" id="nav-ideas" class="nav-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all text-slate-600 hover:bg-slate-50 hover:text-slate-900">
+                <i class="fa-solid fa-box-archive w-5 text-center"></i> All Ideas
+            </button>
+            <button onclick="switchTab('favorites')" id="nav-favorites" class="nav-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all text-slate-600 hover:bg-slate-50 hover:text-slate-900">
+                <i class="fa-solid fa-star w-5 text-center"></i> Favorites
+            </button>
+            <button onclick="switchTab('settings')" id="nav-settings" class="nav-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all text-slate-600 hover:bg-slate-50 hover:text-slate-900">
+                <i class="fa-solid fa-gear w-5 text-center"></i> Settings
+            </button>
+        </nav>
+
+        <div class="pt-4 border-t border-slate-100">
+            <button onclick="openModal()" class="w-full bg-indigo-600 hover:bg-indigo-700 active:bg-indigo-800 text-white font-medium py-3 px-4 rounded-xl shadow-lg shadow-indigo-100 transition-all flex items-center justify-center gap-2">
+                <i class="fa-solid fa-plus text-sm"></i> New Idea
+            </button>
+        </div>
+    </aside>
+
+    <!-- Mobile Top Header -->
+    <header class="md:hidden sticky top-0 z-20 bg-white/80 backdrop-blur-md border-b border-slate-200 px-4 py-3 flex items-center justify-between">
+        <div class="flex items-center gap-2.5">
+            <div class="w-8 h-8 rounded-lg bg-indigo-600 flex items-center justify-center text-white shadow-sm">
+                <i class="fa-solid fa-lightbulb text-sm"></i>
+            </div>
+            <span class="font-bold text-slate-900 text-base">Idea Vault</span>
+        </div>
+        <button onclick="openModal()" class="bg-indigo-600 hover:bg-indigo-700 text-white w-9 h-9 rounded-full flex items-center justify-center shadow-md shadow-indigo-100 transition-all">
+            <i class="fa-solid fa-plus text-sm"></i>
+        </button>
+    </header>
+
+    <!-- Mobile Bottom Navigation Bar -->
+    <nav class="md:hidden fixed bottom-0 inset-x-0 z-30 bg-white border-t border-slate-200 px-4 py-2 flex items-center justify-around shadow-lg">
+        <button onclick="switchTab('home')" id="mob-nav-home" class="mob-nav-btn flex flex-col items-center justify-center py-1 px-3 text-indigo-600 transition-all">
+            <i class="fa-solid fa-house text-lg mb-1"></i>
+            <span class="text-[10px] font-medium">Home</span>
+        </button>
+        <button onclick="switchTab('ideas')" id="mob-nav-ideas" class="mob-nav-btn flex flex-col items-center justify-center py-1 px-3 text-slate-400 hover:text-slate-600 transition-all">
+            <i class="fa-solid fa-box-archive text-lg mb-1"></i>
+            <span class="text-[10px] font-medium">Ideas</span>
+        </button>
+        <button onclick="switchTab('favorites')" id="mob-nav-favorites" class="mob-nav-btn flex flex-col items-center justify-center py-1 px-3 text-slate-400 hover:text-slate-600 transition-all">
+            <i class="fa-solid fa-star text-lg mb-1"></i>
+            <span class="text-[10px] font-medium">Favorites</span>
+        </button>
+        <button onclick="switchTab('settings')" id="mob-nav-settings" class="mob-nav-btn flex flex-col items-center justify-center py-1 px-3 text-slate-400 hover:text-slate-600 transition-all">
+            <i class="fa-solid fa-gear text-lg mb-1"></i>
+            <span class="text-[10px] font-medium">Settings</span>
+        </button>
+    </nav>
+
+    <!-- Main Content Area -->
+    <main class="flex-1 max-w-5xl w-full mx-auto p-4 md:p-8">
+        
+        <!-- HOME / DASHBOARD TAB -->
+        <section id="tab-home" class="tab-content space-y-6">
+            <!-- Welcome banner & Quick Action -->
+            <div class="bg-gradient-to-r from-indigo-600 to-indigo-700 rounded-2xl p-6 text-white shadow-xl shadow-indigo-100 flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+                <div>
+                    <h2 class="text-xl md:text-2xl font-bold mb-1">Capture your next big breakthrough</h2>
+                    <p class="text-indigo-100 text-sm">Your personal vault for brilliant ideas, side projects, and creative sparks.</p>
+                </div>
+                <button onclick="openModal()" class="bg-white text-indigo-600 hover:bg-indigo-50 font-semibold px-5 py-3 rounded-xl shadow-md transition-all flex items-center gap-2 whitespace-nowrap text-sm">
+                    <i class="fa-solid fa-plus"></i> New Idea
+                </button>
+            </div>
+
+            <!-- Stats Grid -->
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4">
+                <div class="bg-white p-4 md:p-5 rounded-2xl border border-slate-100 shadow-sm flex flex-col justify-between">
+                    <div class="flex items-center justify-between text-slate-400 mb-2">
+                        <span class="text-xs font-semibold uppercase tracking-wider">Total Ideas</span>
+                        <div class="w-8 h-8 rounded-lg bg-indigo-50 text-indigo-600 flex items-center justify-center">
+                            <i class="fa-solid fa-lightbulb text-sm"></i>
+                        </div>
+                    </div>
+                    <span id="stat-total" class="text-2xl md:text-3xl font-bold text-slate-900">0</span>
+                </div>
+                <div class="bg-white p-4 md:p-5 rounded-2xl border border-slate-100 shadow-sm flex flex-col justify-between">
+                    <div class="flex items-center justify-between text-slate-400 mb-2">
+                        <span class="text-xs font-semibold uppercase tracking-wider">Favorites</span>
+                        <div class="w-8 h-8 rounded-lg bg-amber-50 text-amber-500 flex items-center justify-center">
+                            <i class="fa-solid fa-star text-sm"></i>
+                        </div>
+                    </div>
+                    <span id="stat-favorites" class="text-2xl md:text-3xl font-bold text-slate-900">0</span>
+                </div>
+                <div class="bg-white p-4 md:p-5 rounded-2xl border border-slate-100 shadow-sm flex flex-col justify-between">
+                    <div class="flex items-center justify-between text-slate-400 mb-2">
+                        <span class="text-xs font-semibold uppercase tracking-wider">Developing</span>
+                        <div class="w-8 h-8 rounded-lg bg-blue-50 text-blue-600 flex items-center justify-center">
+                            <i class="fa-solid fa-hammer text-sm"></i>
+                        </div>
+                    </div>
+                    <span id="stat-developing" class="text-2xl md:text-3xl font-bold text-slate-900">0</span>
+                </div>
+                <div class="bg-white p-4 md:p-5 rounded-2xl border border-slate-100 shadow-sm flex flex-col justify-between">
+                    <div class="flex items-center justify-between text-slate-400 mb-2">
+                        <span class="text-xs font-semibold uppercase tracking-wider">Completed</span>
+                        <div class="w-8 h-8 rounded-lg bg-emerald-50 text-emerald-600 flex items-center justify-center">
+                            <i class="fa-solid fa-circle-check text-sm"></i>
+                        </div>
+                    </div>
+                    <span id="stat-completed" class="text-2xl md:text-3xl font-bold text-slate-900">0</span>
+                </div>
+            </div>
+
+            <!-- Recent Ideas Section -->
+            <div class="space-y-4">
+                <div class="flex items-center justify-between">
+                    <h3 class="font-bold text-slate-900 text-lg">Recent Ideas</h3>
+                    <button onclick="switchTab('ideas')" class="text-indigo-600 hover:text-indigo-700 text-sm font-semibold transition-colors">View All &rarr;</button>
+                </div>
+                <div id="recent-ideas-container" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <!-- Populated via JavaScript -->
+                </div>
+            </div>
+        </section>
+
+        <!-- ALL IDEAS TAB -->
+        <section id="tab-ideas" class="tab-content hidden space-y-6">
+            <div class="flex flex-col md:flex-row items-stretch md:items-center justify-between gap-3">
+                <div>
+                    <h2 class="text-2xl font-bold text-slate-900">All Ideas</h2>
+                    <p class="text-slate-500 text-sm">Search, filter, and manage all your saved ideas.</p>
+                </div>
+                <button onclick="openModal()" class="bg-indigo-600 hover:bg-indigo-700 text-white font-medium px-4 py-2.5 rounded-xl shadow-md transition-all flex items-center justify-center gap-2 text-sm">
+                    <i class="fa-solid fa-plus"></i> New Idea
+                </button>
+            </div>
+
+            <!-- Search and Filter Controls -->
+            <div class="bg-white p-4 rounded-2xl border border-slate-100 shadow-sm space-y-3">
+                <div class="relative">
+                    <i class="fa-solid fa-search absolute left-3.5 top-3.5 text-slate-400"></i>
+                    <input type="text" id="search-input" oninput="renderAllIdeas()" placeholder="Search title, description, or tags..." class="w-full pl-10 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all">
+                </div>
+                <div class="flex flex-wrap items-center gap-2 pt-1 overflow-x-auto no-scrollbar pb-1">
+                    <button onclick="setCategoryFilter('All')" id="cat-filter-All" class="filter-chip px-3 py-1.5 rounded-lg text-xs font-semibold bg-indigo-600 text-white transition-all whitespace-nowrap">All</button>
+                    <button onclick="setCategoryFilter('App Ideas')" id="cat-filter-App Ideas" class="filter-chip px-3 py-1.5 rounded-lg text-xs font-semibold bg-slate-100 text-slate-600 hover:bg-slate-200 transition-all whitespace-nowrap">App Ideas</button>
+                    <button onclick="setCategoryFilter('Business')" id="cat-filter-Business" class="filter-chip px-3 py-1.5 rounded-lg text-xs font-semibold bg-slate-100 text-slate-600 hover:bg-slate-200 transition-all whitespace-nowrap">Business</button>
+                    <button onclick="setCategoryFilter('Writing')" id="cat-filter-Writing" class="filter-chip px-3 py-1.5 rounded-lg text-xs font-semibold bg-slate-100 text-slate-600 hover:bg-slate-200 transition-all whitespace-nowrap">Writing</button>
+                    <button onclick="setCategoryFilter('Games')" id="cat-filter-Games" class="filter-chip px-3 py-1.5 rounded-lg text-xs font-semibold bg-slate-100 text-slate-600 hover:bg-slate-200 transition-all whitespace-nowrap">Games</button>
+                    <button onclick="setCategoryFilter('Personal')" id="cat-filter-Personal" class="filter-chip px-3 py-1.5 rounded-lg text-xs font-semibold bg-slate-100 text-slate-600 hover:bg-slate-200 transition-all whitespace-nowrap">Personal</button>
+                    <button onclick="setCategoryFilter('Other')" id="cat-filter-Other" class="filter-chip px-3 py-1.5 rounded-lg text-xs font-semibold bg-slate-100 text-slate-600 hover:bg-slate-200 transition-all whitespace-nowrap">Other</button>
+                </div>
+            </div>
+
+            <!-- Ideas Grid -->
+            <div id="all-ideas-container" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <!-- Populated via JavaScript -->
+            </div>
+        </section>
+
+        <!-- FAVORITES TAB -->
+        <section id="tab-favorites" class="tab-content hidden space-y-6">
+            <div>
+                <h2 class="text-2xl font-bold text-slate-900">Favorite Ideas</h2>
+                <p class="text-slate-500 text-sm">Quick access to your starred and top priority inspirations.</p>
+            </div>
+            <div id="favorites-container" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <!-- Populated via JavaScript -->
+            </div>
+        </section>
+
+        <!-- SETTINGS TAB -->
+        <section id="tab-settings" class="tab-content hidden space-y-6">
+            <div>
+                <h2 class="text-2xl font-bold text-slate-900">Settings & Data</h2>
+                <p class="text-slate-500 text-sm">Manage local vault storage and app details.</p>
+            </div>
+
+            <div class="bg-white rounded-2xl border border-slate-100 shadow-sm p-6 space-y-6">
+                <!-- App Info -->
+                <div class="flex items-center gap-4 pb-6 border-b border-slate-100">
+                    <div class="w-12 h-12 rounded-xl bg-indigo-50 text-indigo-600 flex items-center justify-center text-xl font-bold shadow-sm">
+                        <i class="fa-solid fa-lightbulb"></i>
+                    </div>
+                    <div>
+                        <h3 class="font-bold text-slate-900 text-base">Idea Vault MVP</h3>
+                        <p class="text-xs text-slate-400">Version 1.0.0 • Clean Local Storage Edition</p>
+                    </div>
+                </div>
+
+                <!-- Storage management -->
+                <div class="space-y-4">
+                    <h4 class="font-semibold text-slate-900 text-sm">Data Management</h4>
+                    <p class="text-xs text-slate-500">Your data is stored securely in your browser's local storage. You can backup your ideas or clear them anytime.</p>
+                    
+                    <div class="flex flex-wrap items-center gap-3 pt-2">
+                        <button onclick="exportData()" class="bg-slate-100 hover:bg-slate-200 text-slate-700 font-medium px-4 py-2.5 rounded-xl text-xs transition-all flex items-center gap-2">
+                            <i class="fa-solid fa-download"></i> Export JSON
+                        </button>
+                        <label class="bg-slate-100 hover:bg-slate-200 text-slate-700 font-medium px-4 py-2.5 rounded-xl text-xs transition-all flex items-center gap-2 cursor-pointer">
+                            <i class="fa-solid fa-upload"></i> Import JSON
+                            <input type="file" id="import-file" accept=".json" onchange="importData(event)" class="hidden">
+                        </label>
+                        <button onclick="confirmClearData()" class="bg-rose-50 hover:bg-rose-100 text-rose-600 font-medium px-4 py-2.5 rounded-xl text-xs transition-all flex items-center gap-2">
+                            <i class="fa-solid fa-trash-can"></i> Clear All Data
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Idea Create / Edit Modal -->
+    <div id="idea-modal" class="fixed inset-0 z-50 bg-slate-900/50 backdrop-blur-sm hidden flex items-center justify-center p-4">
+        <div class="bg-white rounded-3xl max-w-lg w-full p-6 shadow-2xl border border-slate-100 max-h-[90vh] overflow-y-auto">
+            <div class="flex items-center justify-between mb-5">
+                <h3 id="modal-title" class="text-lg font-bold text-slate-900">New Idea</h3>
+                <button onclick="closeModal()" class="w-8 h-8 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-500 flex items-center justify-center transition-colors">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+
+            <form id="idea-form" onsubmit="saveIdea(event)" class="space-y-4">
+                <input type="hidden" id="idea-id">
+                
+                <div>
+                    <label class="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1.5">Title <span class="text-rose-500">*</span></label>
+                    <input type="text" id="input-title" required placeholder="What's your idea called?" class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all">
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1.5">Category <span class="text-rose-500">*</span></label>
+                        <select id="input-category" required class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all">
+                            <option value="App Ideas">App Ideas</option>
+                            <option value="Business">Business</option>
+                            <option value="Writing">Writing</option>
+                            <option value="Games">Games</option>
+                            <option value="Personal">Personal</option>
+                            <option value="Other">Other</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1.5">Status</label>
+                        <select id="input-status" class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all">
+                            <option value="New">New</option>
+                            <option value="Developing">Developing</option>
+                            <option value="Completed">Completed</option>
+                            <option value="Archived">Archived</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1.5">Description <span class="text-rose-500">*</span></label>
+                    <textarea id="input-description" required rows="4" placeholder="Describe the idea in detail..." class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all resize-none"></textarea>
+                </div>
+
+                <div>
+                    <label class="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1.5">Tags (comma separated)</label>
+                    <input type="text" id="input-tags" placeholder="e.g. mobile, SaaS, React" class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all">
+                </div>
+
+                <div class="pt-3 flex items-center justify-end gap-3">
+                    <button type="button" onclick="closeModal()" class="px-5 py-2.5 rounded-xl text-sm font-semibold text-slate-600 hover:bg-slate-100 transition-all">Cancel</button>
+                    <button type="submit" class="px-6 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-sm font-semibold shadow-md shadow-indigo-100 transition-all">Save Idea</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Idea Details Modal -->
+    <div id="details-modal" class="fixed inset-0 z-50 bg-slate-900/50 backdrop-blur-sm hidden flex items-center justify-center p-4">
+        <div class="bg-white rounded-3xl max-w-lg w-full p-6 shadow-2xl border border-slate-100 max-h-[90vh] overflow-y-auto space-y-5">
+            <div class="flex items-start justify-between gap-3">
+                <div class="space-y-1.5">
+                    <div class="flex items-center gap-2 flex-wrap">
+                        <span id="detail-category" class="px-2.5 py-1 rounded-md text-xs font-semibold bg-indigo-50 text-indigo-600">Category</span>
+                        <span id="detail-status" class="px-2.5 py-1 rounded-md text-xs font-semibold bg-slate-100 text-slate-600">Status</span>
+                    </div>
+                    <h3 id="detail-title" class="text-xl font-bold text-slate-900">Idea Title</h3>
+                </div>
+                <div class="flex items-center gap-1">
+                    <button id="detail-fav-btn" onclick="toggleFavoriteFromDetail()" class="w-9 h-9 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-500 flex items-center justify-center transition-colors">
+                        <i class="fa-solid fa-star"></i>
+                    </button>
+                    <button onclick="closeDetailsModal()" class="w-9 h-9 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-500 flex items-center justify-center transition-colors">
+                        <i class="fa-solid fa-xmark"></i>
+                    </button>
+                </div>
+            </div>
+
+            <div class="text-xs text-slate-400 flex items-center gap-2">
+                <i class="fa-regular fa-calendar"></i>
+                <span id="detail-date">Created Date</span>
+            </div>
+
+            <div class="bg-slate-50 p-4 rounded-2xl border border-slate-100">
+                <h4 class="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Description</h4>
+                <p id="detail-description" class="text-sm text-slate-700 whitespace-pre-wrap leading-relaxed">Description content...</p>
+            </div>
+
+            <div>
+                <h4 class="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Tags</h4>
+                <div id="detail-tags" class="flex flex-wrap gap-1.5">
+                    <!-- Tags populated here -->
+                </div>
+            </div>
+
+            <div class="pt-4 border-t border-slate-100 flex items-center justify-between">
+                <button onclick="confirmDeleteCurrentIdea()" class="text-rose-600 hover:bg-rose-50 font-semibold px-4 py-2.5 rounded-xl text-xs transition-all flex items-center gap-2">
+                    <i class="fa-solid fa-trash-can"></i> Delete Idea
+                </button>
+                <button onclick="editCurrentIdea()" class="bg-indigo-600 hover:bg-indigo-700 text-white font-semibold px-5 py-2.5 rounded-xl text-xs shadow-md shadow-indigo-100 transition-all flex items-center gap-2">
+                    <i class="fa-solid fa-pen"></i> Edit Idea
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- JavaScript Application Logic -->
+    <script>
+        let ideas = JSON.parse(localStorage.getItem('idea_vault_items')) || [];
+
+        let currentCategoryFilter = 'All';
+        let currentActiveIdeaId = null;
+
+        // Save to LocalStorage
+        function persistIdeas() {
+            localStorage.setItem('idea_vault_items', JSON.stringify(ideas));
+        }
+
+        // Tab Navigation Switcher
+        function switchTab(tabId) {
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
+            document.getElementById(`tab-${tabId}`).classList.remove('hidden');
+
+            // Update Desktop Nav styles
+            document.querySelectorAll('.nav-btn').forEach(btn => {
+                btn.className = "nav-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all text-slate-600 hover:bg-slate-50 hover:text-slate-900";
+            });
+            const activeNav = document.getElementById(`nav-${tabId}`);
+            if (activeNav) {
+                activeNav.className = "nav-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all text-indigo-600 bg-indigo-50";
+            }
+
+            // Update Mobile Nav styles
+            document.querySelectorAll('.mob-nav-btn').forEach(btn => {
+                btn.className = "mob-nav-btn flex flex-col items-center justify-center py-1 px-3 text-slate-400 hover:text-slate-600 transition-all";
+            });
+            const activeMobNav = document.getElementById(`mob-nav-${tabId}`);
+            if (activeMobNav) {
+                activeMobNav.className = "mob-nav-btn flex flex-col items-center justify-center py-1 px-3 text-indigo-600 transition-all";
+            }
+
+            // Render relevant tab content
+            if (tabId === 'home') renderDashboard();
+            if (tabId === 'ideas') renderAllIdeas();
+            if (tabId === 'favorites') renderFavorites();
+        }
+
+        // Format Date nicely
+        function formatDate(dateString) {
+            const options = { year: 'numeric', month: 'short', day: 'numeric' };
+            return new Date(dateString).toLocaleDateString(undefined, options);
+        }
+
+        // Status badge styling helper
+        function getStatusBadgeClass(status) {
+            switch(status) {
+                case 'New': return 'bg-purple-50 text-purple-600 border border-purple-100';
+                case 'Developing': return 'bg-blue-50 text-blue-600 border border-blue-100';
+                case 'Completed': return 'bg-emerald-50 text-emerald-600 border border-emerald-100';
+                case 'Archived': return 'bg-slate-100 text-slate-500 border border-slate-200';
+                default: return 'bg-slate-100 text-slate-600';
+            }
+        }
+
+        // Category color helper
+        function getCategoryBadgeClass(category) {
+            return 'bg-indigo-50 text-indigo-600 border border-indigo-100';
+        }
+
+        // Render Dashboard Statistics & Recent Ideas
+        function renderDashboard() {
+            const total = ideas.length;
+            const favorites = ideas.filter(i => i.isFavorite).length;
+            const developing = ideas.filter(i => i.status === 'Developing').length;
+            const completed = ideas.filter(i => i.status === 'Completed').length;
+
+            document.getElementById('stat-total').innerText = total;
+            document.getElementById('stat-favorites').innerText = favorites;
+            document.getElementById('stat-developing').innerText = developing;
+            document.getElementById('stat-completed').innerText = completed;
+
+            const recentContainer = document.getElementById('recent-ideas-container');
+            const sortedIdeas = [...ideas].sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+            const recent = sortedIdeas.slice(0, 4);
+
+            if (recent.length === 0) {
+                recentContainer.innerHTML = `
+                    <div class="col-span-full bg-white rounded-2xl border border-slate-100 p-8 text-center space-y-3">
+                        <div class="w-12 h-12 rounded-2xl bg-indigo-50 text-indigo-600 flex items-center justify-center mx-auto text-lg">
+                            <i class="fa-solid fa-lightbulb"></i>
+                        </div>
+                        <h4 class="font-bold text-slate-900 text-base">No ideas yet.</h4>
+                        <p class="text-slate-400 text-xs max-w-sm mx-auto">Capture your first idea before it gets away.</p>
+                        <button onclick="openModal()" class="mt-2 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold px-4 py-2.5 rounded-xl text-xs shadow-md transition-all inline-flex items-center gap-2">
+                            <i class="fa-solid fa-plus"></i> Create Your First Idea
+                        </button>
+                    </div>
+                `;
+                return;
+            }
+
+            recentContainer.innerHTML = recent.map(idea => createIdeaCardHTML(idea)).join('');
+        }
+
+        // Render All Ideas with search and filtering
+        function renderAllIdeas() {
+            const searchTerm = document.getElementById('search-input').value.toLowerCase();
+            
+            let filtered = ideas.filter(idea => {
+                const matchesCategory = currentCategoryFilter === 'All' || idea.category === currentCategoryFilter;
+                const matchesSearch = idea.title.toLowerCase().includes(searchTerm) || 
+                                      idea.description.toLowerCase().includes(searchTerm) || 
+                                      (idea.tags && idea.tags.some(tag => tag.toLowerCase().includes(searchTerm)));
+                return matchesCategory && matchesSearch;
+            });
+
+            // Sort by newest first
+            filtered.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+
+            const container = document.getElementById('all-ideas-container');
+
+            if (filtered.length === 0) {
+                container.innerHTML = `
+                    <div class="col-span-full bg-white rounded-2xl border border-slate-100 p-10 text-center space-y-3">
+                        <div class="w-12 h-12 rounded-2xl bg-slate-100 text-slate-400 flex items-center justify-center mx-auto text-lg">
+                            <i class="fa-solid fa-magnifying-glass"></i>
+                        </div>
+                        <h4 class="font-bold text-slate-900 text-base">No matching ideas found</h4>
+                        <p class="text-slate-400 text-xs">Try adjusting your search query or category filter.</p>
+                    </div>
+                `;
+                return;
+            }
+
+            container.innerHTML = filtered.map(idea => createIdeaCardHTML(idea)).join('');
+        }
+
+        // Render Favorites
+        function renderFavorites() {
+            const favorites = ideas.filter(i => i.isFavorite);
+            favorites.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+            const container = document.getElementById('favorites-container');
+
+            if (favorites.length === 0) {
+                container.innerHTML = `
+                    <div class="col-span-full bg-white rounded-2xl border border-slate-100 p-10 text-center space-y-3">
+                        <div class="w-12 h-12 rounded-2xl bg-amber-50 text-amber-500 flex items-center justify-center mx-auto text-lg">
+                            <i class="fa-solid fa-star"></i>
+                        </div>
+                        <h4 class="font-bold text-slate-900 text-base">No favorite ideas yet</h4>
+                        <p class="text-slate-400 text-xs">Click the star icon on any idea card to add it to your favorites.</p>
+                    </div>
+                `;
+                return;
+            }
+
+            container.innerHTML = favorites.map(idea => createIdeaCardHTML(idea)).join('');
+        }
+
+        // Card HTML Generator
+        function createIdeaCardHTML(idea) {
+            const tagsHTML = idea.tags && idea.tags.length > 0 
+                ? idea.tags.map(t => `<span class="text-[10px] font-medium bg-slate-100 text-slate-600 px-2 py-0.5 rounded">#${t.trim()}</span>`).join('') 
+                : '';
+
+            return `
+                <div onclick="openDetailsModal('${idea.id}')" class="bg-white rounded-2xl border border-slate-100 p-5 shadow-sm hover:shadow-md transition-all cursor-pointer flex flex-col justify-between gap-4 group">
+                    <div class="space-y-2">
+                        <div class="flex items-start justify-between gap-2">
+                            <div class="flex items-center gap-2 flex-wrap">
+                                <span class="px-2.5 py-0.5 rounded text-[11px] font-semibold ${getCategoryBadgeClass(idea.category)}">${idea.category}</span>
+                                <span class="px-2.5 py-0.5 rounded text-[11px] font-semibold ${getStatusBadgeClass(idea.status)}">${idea.status}</span>
+                            </div>
+                            <button onclick="event.stopPropagation(); toggleFavorite('${idea.id}')" class="w-8 h-8 rounded-full hover:bg-slate-50 flex items-center justify-center text-slate-300 hover:text-amber-400 transition-colors ${idea.isFavorite ? 'text-amber-400' : ''}">
+                                <i class="fa-solid fa-star text-sm"></i>
+                            </button>
+                        </div>
+                        <h3 class="font-bold text-slate-900 group-hover:text-indigo-600 transition-colors text-base leading-snug">${escapeHtml(idea.title)}</h3>
+                        <p class="text-slate-500 text-xs line-clamp-2 leading-relaxed">${escapeHtml(idea.description)}</p>
+                    </div>
+
+                    <div class="space-y-3 pt-2 border-t border-slate-50">
+                        ${tagsHTML ? `<div class="flex flex-wrap gap-1">${tagsHTML}</div>` : ''}
+                        <div class="flex items-center justify-between text-[11px] text-slate-400">
+                            <span><i class="fa-regular fa-calendar mr-1"></i>${formatDate(idea.createdAt)}</span>
+                            <span class="text-indigo-600 font-semibold group-hover:underline">View details &rarr;</span>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        // Category Filter Switcher
+        function setCategoryFilter(category) {
+            currentCategoryFilter = category;
+            document.querySelectorAll('.filter-chip').forEach(chip => {
+                chip.className = "filter-chip px-3 py-1.5 rounded-lg text-xs font-semibold bg-slate-100 text-slate-600 hover:bg-slate-200 transition-all whitespace-nowrap";
+            });
+            document.getElementById(`cat-filter-${category}`).className = "filter-chip px-3 py-1.5 rounded-lg text-xs font-semibold bg-indigo-600 text-white transition-all whitespace-nowrap";
+            renderAllIdeas();
+        }
+
+        // Toggle Favorite status
+        function toggleFavorite(id) {
+            const idea = ideas.find(i => i.id === id);
+            if (idea) {
+                idea.isFavorite = !idea.isFavorite;
+                persistIdeas();
+                refreshCurrentViews();
+            }
+        }
+
+        function toggleFavoriteFromDetail() {
+            if (currentActiveIdeaId) {
+                toggleFavorite(currentActiveIdeaId);
+                openDetailsModal(currentActiveIdeaId); // Refresh modal view
+            }
+        }
+
+        function refreshCurrentViews() {
+            renderDashboard();
+            renderAllIdeas();
+            renderFavorites();
+        }
+
+        // Modal Handlers (Create / Edit)
+        function openModal(editId = null) {
+            const modal = document.getElementById('idea-modal');
+            const form = document.getElementById('idea-form');
+            form.reset();
+            document.getElementById('idea-id').value = '';
+
+            if (editId) {
+                const idea = ideas.find(i => i.id === editId);
+                if (idea) {
+                    document.getElementById('modal-title').innerText = 'Edit Idea';
+                    document.getElementById('idea-id').value = idea.id;
+                    document.getElementById('input-title').value = idea.title;
+                    document.getElementById('input-category').value = idea.category;
+                    document.getElementById('input-status').value = idea.status;
+                    document.getElementById('input-description').value = idea.description;
+                    document.getElementById('input-tags').value = idea.tags ? idea.tags.join(', ') : '';
+                }
+            } else {
+                document.getElementById('modal-title').innerText = 'New Idea';
+                document.getElementById('input-status').value = 'New';
+            }
+
+            modal.classList.remove('hidden');
+        }
+
+        function closeModal() {
+            document.getElementById('idea-modal').classList.add('hidden');
+        }
+
+        // Save Idea (Create or Update)
+        function saveIdea(e) {
+            e.preventDefault();
+            const id = document.getElementById('idea-id').value;
+            const title = document.getElementById('input-title').value.trim();
+            const category = document.getElementById('input-category').value;
+            const status = document.getElementById('input-status').value;
+            const description = document.getElementById('input-description').value.trim();
+            const tagsRaw = document.getElementById('input-tags').value;
+            const tags = tagsRaw ? tagsRaw.split(',').map(t => t.trim()).filter(t => t.length > 0) : [];
+
+            if (!title || !description) return;
+
+            if (id) {
+                // Update existing
+                const index = ideas.findIndex(i => i.id === id);
+                if (index !== -1) {
+                    ideas[index] = {
+                        ...ideas[index],
+                        title,
+                        category,
+                        status,
+                        description,
+                        tags
+                    };
+                }
+            } else {
+                // Create new
+                const newIdea = {
+                    id: Date.now().toString(),
+                    title,
+                    category,
+                    status,
+                    description,
+                    tags,
+                    isFavorite: false,
+                    createdAt: new Date().toISOString()
+                };
+                ideas.push(newIdea);
+            }
+
+            persistIdeas();
+            closeModal();
+            refreshCurrentViews();
+        }
+
+        // Details Modal Handlers
+        function openDetailsModal(id) {
+            const idea = ideas.find(i => i.id === id);
+            if (!idea) return;
+
+            currentActiveIdeaId = id;
+            document.getElementById('detail-title').innerText = idea.title;
+            document.getElementById('detail-category').innerText = idea.category;
+            document.getElementById('detail-status').innerText = idea.status;
+            document.getElementById('detail-status').className = `px-2.5 py-1 rounded-md text-xs font-semibold ${getStatusBadgeClass(idea.status)}`;
+            document.getElementById('detail-date').innerText = `Created on ${formatDate(idea.createdAt)}`;
+            document.getElementById('detail-description').innerText = idea.description;
+
+            const favBtn = document.getElementById('detail-fav-btn');
+            favBtn.className = `w-9 h-9 rounded-full bg-slate-100 hover:bg-slate-200 flex items-center justify-center transition-colors ${idea.isFavorite ? 'text-amber-400' : 'text-slate-500'}`;
+
+            const tagsContainer = document.getElementById('detail-tags');
+            if (idea.tags && idea.tags.length > 0) {
+                tagsContainer.innerHTML = idea.tags.map(t => `<span class="text-xs font-medium bg-slate-100 text-slate-700 px-2.5 py-1 rounded-lg">#${t.trim()}</span>`).join('');
+            } else {
+                tagsContainer.innerHTML = `<span class="text-xs text-slate-400 italic">No tags added</span>`;
+            }
+
+            document.getElementById('details-modal').classList.remove('hidden');
+        }
+
+        function closeDetailsModal() {
+            document.getElementById('details-modal').classList.add('hidden');
+            currentActiveIdeaId = null;
+        }
+
+        function editCurrentIdea() {
+            const id = currentActiveIdeaId;
+            closeDetailsModal();
+            openModal(id);
+        }
+
+        // Delete Idea with confirmation dialog
+        function confirmDeleteCurrentIdea() {
+            if (!currentActiveIdeaId) return;
+            
+            const confirmed = confirm("Are you sure you want to delete this idea?");
+            if (confirmed) {
+                ideas = ideas.filter(i => i.id !== currentActiveIdeaId);
+                persistIdeas();
+                closeDetailsModal();
+                refreshCurrentViews();
+            }
+        }
+
+        // Settings Data Export / Import / Clear
+        function exportData() {
+            const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(ideas, null, 2));
+            const downloadAnchor = document.createElement('a');
+            downloadAnchor.setAttribute("href", dataStr);
+            downloadAnchor.setAttribute("download", `idea_vault_backup_${new Date().toISOString().slice(0, 10)}.json`);
+            document.body.appendChild(downloadAnchor);
+            downloadAnchor.click();
+            downloadAnchor.remove();
+        }
+
+        function importData(event) {
+            const fileReader = new FileReader();
+            if (event.target.files[0]) {
+                fileReader.readAsText(event.target.files[0], "UTF-8");
+                fileReader.onload = (e) => {
+                    try {
+                        const parsed = JSON.parse(e.target.result);
+                        if (Array.isArray(parsed)) {
+                            ideas = parsed;
+                            persistIdeas();
+                            refreshCurrentViews();
+                            alert("Ideas imported successfully!");
+                        } else {
+                            alert("Invalid JSON file format.");
+                        }
+                    } catch (err) {
+                        alert("Error parsing JSON file.");
+                    }
+                };
+            }
+        }
+
+        function confirmClearData() {
+            const confirmed = confirm("Are you sure you want to clear all ideas? This action cannot be undone.");
+            if (confirmed) {
+                ideas = [];
+                persistIdeas();
+                refreshCurrentViews();
+                switchTab('home');
+            }
+        }
+
+        // Utility: Escape HTML to prevent XSS
+        function escapeHtml(str) {
+            return str.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;");
+        }
+
+        // Initialize on load
+        window.onload = function() {
+            renderDashboard();
+        };
+    </script>
+</body>
+</html>
